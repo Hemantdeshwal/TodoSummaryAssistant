@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: todo-backend-config-prod
 data:
-  SPRING_DATASOURCE_URL: jdbc:mysql://mysql-dev:3306/todo_db?createDatabaseIfNotExist=true
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql-prod:3306/todo_db?createDatabaseIfNotExist=true
   SPRING_DATASOURCE_USERNAME: todo_user
 
