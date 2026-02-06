@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-backend-dev
+  labels:
+    app: todo-backend
+    env: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-backend
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: todo-backend
+        env: dev
+    spec:
+      containers:
+      - name: todo-backend
+        image: hemantdeshwal19/todo-backend:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        envFrom:
+        - configMapRef:
+            name: todo-backend-config-dev
+        - secretRef:
+            name: todo-backend-secret-dev
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 20
+          periodSeconds: 5
+

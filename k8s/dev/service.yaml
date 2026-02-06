@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: todo-backend-dev
+spec:
+  selector:
+    app: todo-backend
+    env: dev
+  ports:
+  - port: 80
+    targetPort: 8080
+  type: ClusterIP
+
