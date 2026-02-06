@@ -1,0 +1,10 @@
+target/
+.git/
+.gitignore
+Dockerfile
+README.md
+node_modules/
+frontend/
+.idea/
+.vscode/
+
