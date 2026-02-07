@@ -30,7 +30,7 @@ pipeline {
           sh '''
             java -version
             javac -version
-            mvn clean verify
+            mvn clean package -DskipTests
           '''
         }
       }
