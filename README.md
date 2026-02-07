@@ -1,126 +1,251 @@
-# Todo Summary Assistant
+Todo Summary Assistant
+A full‑stack app to manage personal to‑do items, summarize pending tasks using Cohere LLM, and send the summary to a Slack channel.
 
-A full-stack application to manage personal to-do items, summarize pending tasks using Cohere LLM, and send the summary to a Slack channel.
+Features
+Create, edit, delete to‑do items (full CRUD).
 
-## Table of Contents
+View current to‑do list with status.
 
-* [Features](#features)
-* [Tech Stack](#tech-stack)
-* [Setup Instructions](#setup-instructions)
-    * [Prerequisites](#prerequisites)
-    * [Backend Setup](#backend-setup)
-    * [Frontend Setup](#frontend-setup)
-* [LLM (Cohere) Setup](#llm-cohere-setup)
-* [Slack Integration Setup](#slack-integration-setup)
-* [Design/Architecture Decisions](#designarchitecture-decisions)
+Summarize pending to‑dos via Cohere LLM.
+
+Send the summary to a Slack channel using Incoming Webhooks.
+
+Show notifications for success or failure of Slack operations.
+​
+
+Tech Stack
+Frontend: React, HTML, CSS, JavaScript, Axios.
+
+Backend: Spring Boot (Java 17+), Maven.
+
+Database: MySQL (Spring Data JPA, Hibernate).
+
+LLM: Cohere API.
+
+Messaging: Slack Incoming Webhooks.
+
+HTTP client: OkHttp.
+
+Containerization: Docker.
+
+CI: Jenkins.
+
+Orchestration: Kubernetes.
+
+GitOps: Argo CD.
+
+1. Setup Instructions
+1.1 Prerequisites
+JDK 17
+
+Maven 3.9+
+
+Node.js 18+ and npm
+
+MySQL 8.x
+
+Docker (optional, for containers)
+
+Kubernetes + kubectl (optional, for K8s)
+
+Argo CD (optional, for GitOps)
+​
+
+1.2 Backend – Local Run
+Clone the repo and go to the backend:
 
 
-## Features
+git clone https://github.com/<your-username>/TodoSummaryAssistant.git
+cd TodoSummaryAssistant/Backend/todo-summary-assistant
+Set env vars (adjust values):
 
-* **Create, Edit, Delete To-Do Items:** Full CRUD operations for personal to-do items.
-* **View To-Do List:** Display current to-do items with their status.
-* **Summarize Pending To-Dos:** Utilizes Cohere LLM to generate a concise summary of all pending to-do items.
-* **Send Summary to Slack:** Automatically posts the generated summary to a configured Slack channel using Incoming Webhooks.
-* **Notifications:** Provides success/failure messages for Slack operations.
 
-## Tech Stack
+export SPRING_DATASOURCE_URL="jdbc:mysql://localhost:3306/todo_db?createDatabaseIfNotExist=true"
+export SPRING_DATASOURCE_USERNAME="root"
+export SPRING_DATASOURCE_PASSWORD="your_mysql_password"
+export COHERE_API_KEY="your_cohere_api_key"
+export SLACK_WEBHOOK_URL="your_slack_webhook_url"
+Build and run:
 
-* **Frontend:** HTML, CSS, Javascript, React, Axios(for API calls), 
-* **Backend:** Spring Boot (Java 17+), Maven
-* **Database:** MySQL (via Spring Data JPA and Hibernate)
-* **LLM:** Cohere API
-* **Messaging:** Slack Incoming Webhooks
-* **HTTP Client:** OkHttp (for Cohere and Slack API calls in backend)
+./mvnw clean package
+java -jar target/todo-summary-assistant-*.jar
+Backend URL: http://localhost:8080.
+​
 
-## Setup Instructions
+1.3 Frontend – Local Run
+cd TodoSummaryAssistant/Frontend
+npm install
+npm start
+Frontend URL: http://localhost:3000.
+It calls the backend at http://localhost:8080 (change API base URL in frontend if needed).
+​
 
-### Prerequisites
+1.4 Environment Variables
+Backend expects:
 
-* Java Development Kit (JDK) 17 or higher
-* Node.js and npm (or yarn)
-* MySQL Server running locally or accessible remotely
-* A Cohere API Key
-* A Slack Workspace and an Incoming Webhook URL
+SPRING_DATASOURCE_URL
 
-### Backend Setup
+SPRING_DATASOURCE_USERNAME
 
-1.  **Clone the repository:**
-    ```bash
-    git clone [https://github.com/your-username/todo-summary-assistant.git](https://github.com/your-username/todo-summary-assistant.git)
-    cd todo-summary-assistant/backend
-    ```
-2.  **Configure `application.properties`:**
-    Open `src/main/resources/application.properties` and update the following:
-    ```properties
-    spring.datasource.url=jdbc:mysql://localhost:3306/todo_db?createDatabaseIfNotExist=true
-    spring.datasource.username=root
-    spring.datasource.password=your_mysql_password_here # <-- IMPORTANT: Replace with your MySQL root password
-    cohere.api.key=YOUR_COHERE_API_KEY # <-- IMPORTANT: Replace with your Cohere API Key
-    slack.webhook.url=YOUR_SLACK_WEBHOOK_URL # <-- IMPORTANT: Replace with your Slack Incoming Webhook URL
-    ```
-3.  **Build and Run:**
-    ```bash
-    mvn clean install
-    mvn spring-boot:run
-    ```
-    The backend will start on `http://localhost:8080`.
+SPRING_DATASOURCE_PASSWORD
 
-### Frontend Setup
+COHERE_API_KEY
 
-1.  **Navigate to the frontend directory:**
-    ```bash
-    cd ../frontend
-    ```
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    # or yarn install
-    ```
-3.  **Run the React application:**
-    ```bash
-    npm start
-    # or yarn start
-    ```
-    The frontend will open in your browser at `http://localhost:3000`.
+SLACK_WEBHOOK_URL
+​
 
-## LLM (Cohere) Setup
+In Kubernetes:
 
-1.  **Create a Cohere Account:** Visit [Cohere.ai](https://cohere.ai/) and sign up for a free account.
-2.  **Obtain API Key:** Once logged in, navigate to your dashboard or API keys section to find your API key.
-3.  **Update `application.properties`:** Paste your Cohere API key into `cohere.api.key` in the backend's `application.properties` file.
+ConfigMap: DB URL, DB username.
 
-## Slack Integration Setup
+Secret: DB password, Cohere key, Slack webhook.
+​
 
-1.  **Create a Slack App:**
-    * Go to [api.slack.com/apps](https://api.slack.com/apps).
-    * Click "Create New App" and choose "From scratch".
-    * Give your app a name (e.g., "Todo Summary Bot") and select your Slack workspace.
-2.  **Activate Incoming Webhooks:**
-    * From your app's settings page, navigate to "Features" -> "Incoming Webhooks".
-    * Toggle the "Activate Incoming Webhooks" switch to "On".
-    * Scroll down and click the "Add New Webhook to Workspace" button.
-    * Select the specific channel where you want the to-do summaries to be posted (e.g., `#general`, `#todos`, or a new channel).
-    * Click "Allow".
-3.  **Copy Webhook URL:**
-    * A unique Webhook URL will be generated. Copy this URL.
-4.  **Update `application.properties`:** Paste this URL into `slack.webhook.url` in the backend's `application.properties` file.
+1.5 Assumptions
+MySQL is reachable and user can create/access todo_db.
 
-## Design/Architecture Decisions
+Local MySQL runs on localhost:3306.
 
-* **Separation of Concerns:** The project is cleanly separated into frontend (React) and backend (Spring Boot) directories, allowing independent development and deployment.
-* **RESTful API:** The backend exposes standard RESTful endpoints for managing todos, ensuring clear and predictable communication with the frontend.
-* **Spring Data JPA:** Leveraged for efficient and simplified database interactions with MySQL, reducing boilerplate code for data access.
-* **Service Layer:** Business logic (CRUD operations, LLM calls, Slack calls) is encapsulated within dedicated service classes, promoting modularity and testability.
-* **External API Integration:** `OkHttp` was chosen as a lightweight and efficient HTTP client for making external API calls to Cohere and Slack.
-* **CORS Configuration:** Explicit CORS configuration in Spring Boot ensures that the React frontend can communicate with the backend.
-* **Error Handling:** Basic error handling is implemented on both frontend and backend to provide user feedback and log issues.
-* **LLM Prompt Engineering:** A simple prompt is used for Cohere to instruct it on summarizing the list of to-do items. This can be further refined for better results.
-* **Notification System:** A simple notification component in React provides immediate feedback to the user about operations.
+Cohere and Slack credentials are passed via env vars or K8s Secrets and never committed to Git.
 
-## Demo Images
+Dev/prod use separate namespaces and ConfigMaps/Secrets in K8s.
 
-![Screenshot (1146)](https://github.com/user-attachments/assets/53fe53e3-b527-4659-9ab6-b462ae034fbd)
+2. Docker Usage
+Backend Dockerfile: Backend/todo-summary-assistant/Dockerfile (multi‑stage, non‑root, externalized config).
+​
 
-![Screenshot (1144)](https://github.com/user-attachments/assets/474b1a46-36c8-4407-8bf9-a46ca911603b)
+Build:
 
-![Screenshot (1143)](https://github.com/user-attachments/assets/1e9f8783-d0df-42ce-a3f8-ec7ca5e7c078)
+
+cd Backend/todo-summary-assistant
+docker build -t <hemantdeshwal19>/todo-backend:latest .
+Run:
+
+
+docker run -p 8080:8080 \
+  -e SPRING_DATASOURCE_URL="jdbc:mysql://host.docker.internal:3306/todo_db?createDatabaseIfNotExist=true" \
+  -e SPRING_DATASOURCE_USERNAME="root" \
+  -e SPRING_DATASOURCE_PASSWORD="your_mysql_password" \
+  -e COHERE_API_KEY="your_cohere_api_key" \
+  -e SLACK_WEBHOOK_URL="your_slack_webhook_url" \
+  <hemantdeshwal19>/todo-backend:latest
+Key choices: multi‑stage image, non‑root user, all config via env vars.
+​
+
+3. Kubernetes Deployment
+K8s manifests live in k8s/:
+​
+
+k8s/dev: deployment.yaml, service.yaml, configmap.yaml, secret.yaml
+
+k8s/prod: deployment.yaml, service.yaml, configmap.yaml, secret.yaml
+
+Deployment
+Image: hemantdeshwal19/todo-backend:latest (or a tag you set via GitOps).
+
+CPU/memory requests & limits.
+
+Liveness & readiness probes on /actuator/health, port 8080.
+
+envFrom ConfigMap + Secret.
+​
+
+Service
+Type: ClusterIP, port 80 → container port 8080.
+
+Labels: app: todo-backend, env: dev|prod.
+​
+
+ConfigMap / Secret
+ConfigMap: SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME.
+
+Secret: SPRING_DATASOURCE_PASSWORD, COHERE_API_KEY, SLACK_WEBHOOK_URL (base64).
+​
+
+4. GitOps with Argo CD
+GitOps config: gitops/argocd-apps/.
+​
+
+dev-app.yaml
+repoURL: https://github.com/<Hemantdeshwal>/TodoSummaryAssistant.git
+
+path: k8s/dev
+
+namespace: dev
+
+prod-app.yaml
+repoURL: https://github.com/<Hemantdeshwal>/TodoSummaryAssistant.git
+
+path: k8s/prod
+
+namespace: prod
+​
+
+Sync policy: automated, prune: true, selfHeal: true.
+​
+
+Flow:
+
+Jenkins builds and pushes Docker image.
+
+You update the image tag or manifest in k8s/dev or k8s/prod and push to Git.
+
+Argo CD sees the Git change and syncs the cluster.
+
+Rollback: revert the manifest change (e.g. image tag) in Git; Argo CD rolls the cluster back.
+
+5. CI with Jenkins
+A Jenkinsfile at the repo root will:
+​
+
+Checkout code.
+
+Run ./mvnw clean verify in Backend/todo-summary-assistant.
+
+Build Docker image tagged with commit SHA.
+
+Push to Docker Hub using Jenkins credentials.
+
+Not call kubectl or Argo CD; deployments are GitOps‑driven.
+
+6. LLM (Cohere) Setup
+Create account: https://cohere.ai
+
+Get API key from Cohere dashboard.
+
+Provide it as COHERE_API_KEY or via K8s Secret mapped to that env var.
+
+Backend uses this key to call Cohere and summarize pending to‑dos.
+​
+
+7. Slack Integration Setup
+Create Slack app at https://api.slack.com/apps.
+
+Enable Incoming Webhooks.
+
+Create a webhook for your target channel (e.g. #todos).
+
+Set SLACK_WEBHOOK_URL or store it in a K8s Secret.
+
+Backend posts summaries to that Slack channel.
+​
+
+8. Design / Architecture Decisions
+Separate frontend and backend directories for independent deploys.
+
+RESTful API between React and Spring Boot.
+
+Spring Data JPA for MySQL access.
+
+Service layer for business logic and external integrations.
+
+OkHttp for Cohere and Slack HTTP calls.
+
+CORS config in backend for local frontend dev.
+
+Errors surfaced via frontend notifications and backend logs.
+
+Config and secrets externalized (env vars, ConfigMaps, Secrets).
+
+GitOps: cluster state = Git state; CI only builds & pushes images.
+
